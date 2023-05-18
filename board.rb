@@ -1,10 +1,12 @@
 # frozen_string_literal: true
-require_relative 'rook'
-require_relative 'knight'
-require_relative 'bishop'
-require_relative 'queen'
-require_relative 'king'
-require_relative 'pawn'
+
+require './pieces/rook'
+require './pieces/knight'
+require './pieces/bishop'
+require './pieces/queen'
+require './pieces/king'
+require './pieces/pawn'
+require_relative 'piece'
 
 class Board
   attr_reader :grid
@@ -33,25 +35,30 @@ class Board
       column >= 0
   end
 
+  def empty?(location)
+    row, column = location
+    grid[row][column].is_a String
+  end
+
   def place_pieces
-    grid[0][0] = Rook.new('white', [0, 0])
-    grid[0][7] = Rook.new('white', [0, 7])
-    grid[0][1] = Knight.new('white', [0, 1])
-    grid[0][6] = Knight.new('white', [0, 6])
-    grid[0][2] = Bishop.new('white', [0, 2])
-    grid[0][5] = Bishop.new('white', [0, 5])
-    grid[0][3] = Queen.new('white', [0, 3])
-    grid[0][4] = King.new('white', [0, 4])
-    8.times { |i| grid[1][i] = Pawn.new('white', [1, i]) }
-    grid[7][0] = Rook.new('black', [7, 0])
-    grid[7][7] = Rook.new('black', [7, 7])
-    grid[7][1] = Knight.new('black', [7, 1])
-    grid[7][6] = Knight.new('black', [7, 6])
-    grid[7][2] = Bishop.new('black', [7, 2])
-    grid[7][5] = Bishop.new('black', [7, 5])
-    grid[7][3] = Queen.new('black', [7, 3])
-    grid[7][4] = King.new('black', [7, 4])
-    8.times { |i| grid[6][i] = Pawn.new('black', [6, i]) }
+    grid[0][0] = Rook.new(grid, :white, [0, 0])
+    grid[0][7] = Rook.new(grid, :white, [0, 7])
+    grid[0][1] = Knight.new(grid, :white, [0, 1])
+    grid[0][6] = Knight.new(grid, :white, [0, 6])
+    grid[0][2] = Bishop.new(grid, :white, [0, 2])
+    grid[0][5] = Bishop.new(grid, :white, [0, 5])
+    grid[0][3] = Queen.new(grid, :white, [0, 3])
+    grid[0][4] = King.new(grid, :white, [0, 4])
+    8.times { |i| grid[1][i] = Pawn.new(grid, :white, [1, i]) }
+    grid[7][0] = Rook.new(grid, :black, [7, 0])
+    grid[7][7] = Rook.new(grid, :black, [7, 7])
+    grid[7][1] = Knight.new(grid, :black, [7, 1])
+    grid[7][6] = Knight.new(grid, :black, [7, 6])
+    grid[7][2] = Bishop.new(grid, :black, [7, 2])
+    grid[7][5] = Bishop.new(grid, :black, [7, 5])
+    grid[7][3] = Queen.new(grid, :black, [7, 3])
+    grid[7][4] = King.new(grid, :black, [7, 4])
+    8.times { |i| grid[6][i] = Pawn.new(grid, :black, [6, i]) }
   end
 
   def display
@@ -80,11 +87,11 @@ class Board
 
   def filter(row)
     row.map do |position|
-      if !position.is_a? String  
-        position.symbol 
-      else 
+      if !position.is_a? String
+        position.symbol
+      else
         position
-      end 
-    end 
-  end 
+      end
+    end
+  end
 end
