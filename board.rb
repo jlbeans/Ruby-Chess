@@ -7,13 +7,36 @@ require './pieces/queen'
 require './pieces/king'
 require './pieces/pawn'
 require_relative 'piece'
+require_relative 'invalid'
 
 class Board
   attr_reader :grid
 
+  def self.fill
+    board = new
+    board[[0, 0]] = Rook.new(board, :white, [0, 0])
+    board[[0, 7]] = Rook.new(board, :white, [0, 7])
+    board[[0, 1]] = Knight.new(board, :white, [0, 1])
+    board[[0, 6]] = Knight.new(board, :white, [0, 6])
+    board[[0, 2]] = Bishop.new(board, :white, [0, 2])
+    board[[0, 5]] = Bishop.new(board, :white, [0, 5])
+    board[[0, 3]] = Queen.new(board, :white, [0, 3])
+    board[[0, 4]] = King.new(board, :white, [0, 4])
+    8.times { |i| board[[1, i]] = Pawn.new(board, :white, [1, i]) }
+    board[[7, 0]] = Rook.new(board, :black, [7, 0])
+    board[[7, 7]] = Rook.new(board, :black, [7, 7])
+    board[[7, 1]] = Knight.new(board, :black, [7, 1])
+    board[[7, 6]] = Knight.new(board, :black, [7, 6])
+    board[[7, 2]] = Bishop.new(board, :black, [7, 2])
+    board[[7, 5]] = Bishop.new(board, :black, [7, 5])
+    board[[7, 3]] = Queen.new(board, :black, [7, 3])
+    board[[7, 4]] = King.new(board, :black, [7, 4])
+    8.times { |i| board[[6, i]] = Pawn.new(board, :black, [6, i]) }
+    board
+  end
+
   def initialize
-    @grid = Array.new(8) { Array.new(8, '-') }
-    place_pieces
+    @grid = Array.new(8) { Array.new(8) }
   end
 
   def []=(location, piece)
@@ -33,32 +56,6 @@ class Board
       column < grid.first.length &&
       row >= 0 &&
       column >= 0
-  end
-
-  def empty?(location)
-    row, column = location
-    grid[row][column].is_a String
-  end
-
-  def place_pieces
-    grid[0][0] = Rook.new(grid, :white, [0, 0])
-    grid[0][7] = Rook.new(grid, :white, [0, 7])
-    grid[0][1] = Knight.new(grid, :white, [0, 1])
-    grid[0][6] = Knight.new(grid, :white, [0, 6])
-    grid[0][2] = Bishop.new(grid, :white, [0, 2])
-    grid[0][5] = Bishop.new(grid, :white, [0, 5])
-    grid[0][3] = Queen.new(grid, :white, [0, 3])
-    grid[0][4] = King.new(grid, :white, [0, 4])
-    8.times { |i| grid[1][i] = Pawn.new(grid, :white, [1, i]) }
-    grid[7][0] = Rook.new(grid, :black, [7, 0])
-    grid[7][7] = Rook.new(grid, :black, [7, 7])
-    grid[7][1] = Knight.new(grid, :black, [7, 1])
-    grid[7][6] = Knight.new(grid, :black, [7, 6])
-    grid[7][2] = Bishop.new(grid, :black, [7, 2])
-    grid[7][5] = Bishop.new(grid, :black, [7, 5])
-    grid[7][3] = Queen.new(grid, :black, [7, 3])
-    grid[7][4] = King.new(grid, :black, [7, 4])
-    8.times { |i| grid[6][i] = Pawn.new(grid, :black, [6, i]) }
   end
 
   def display
@@ -85,12 +82,29 @@ class Board
     "
   end
 
+  def empty?(location)
+    row, column = location
+    grid[row][column].nil?
+  end
+
+  def move_piece(start_pos, end_pos)
+    piece = self[start_pos]
+    raise InvalidMoveError, 'Out of bounds!' unless in_bounds?(end_pos)
+    raise InvalidMoveError, 'Unavailable move!' unless piece.available_moves.include?(end_pos)
+
+    self[start_pos] = nil
+    self[end_pos] = piece
+    piece.position = end_pos
+  end
+
+  private
+
   def filter(row)
     row.map do |position|
-      if !position.is_a? String
+      if !position.nil?
         position.symbol
       else
-        position
+        '-'
       end
     end
   end

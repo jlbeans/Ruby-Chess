@@ -10,9 +10,9 @@ module Slideable
         current_row += row
         current_column += column
         next_position = [current_row, current_column]
-        break unless board.in_bounds(next_position)
+        break unless board.in_bounds?(next_position) && board.empty?(next_position)
 
-        moves << next_position if board.empty?(next_position)
+        moves << next_position
         if enemy?(next_position)
           moves << next_position
           break

@@ -20,8 +20,4 @@ class Rook < Piece
       [0, 1]
     ]
   end
-
-  def enemy?(position)
-    !board[position].empty? && !board[position].color.self?
-  end
 end

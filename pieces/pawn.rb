@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 require './piece'
-require './stepable'
 
 class Pawn < Piece
-  include Stepable
   attr_reader :symbol
 
   def initialize(board, color, position)
@@ -12,9 +10,20 @@ class Pawn < Piece
     @symbol = color == :black ? "\u265F" : "\u2659"
   end
 
-  def directions
-    [
-      [1, 0]
-    ]
+  def available_moves
+    moves = []
+    current_row, current_column = position
+    moves << [(current_row + 2), current_column] if starting_pos?(current_row)
+    moves << [(current_row + 1), current_column]
+    moves.keep_if { |move| board.in_bounds?(move) && board.empty?(move) }
+    moves << [(current_row + 1), (current_column + 1)] if enemy?([(current_row + 1), (current_column + 1)])
+    moves << [(current_row + 1), (current_column - 1)] if enemy?([(current_row + 1), (current_column - 1)])
+    moves
   end
+
+  def starting_pos?(row)
+    [1, 6].include?(row)
+  end
+
+  def en_passant; end
 end
