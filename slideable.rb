@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'board'
+
 module Slideable
   def available_moves
     moves = []

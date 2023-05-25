@@ -17,14 +17,22 @@ class Game
   end
 
   def play
-    #until in check or in stalemate
-    loop do
+    until game_over?
       board.display
       puts "It's #{current_player.name}'s turn"
+      if board.in_check?(current_player.color)
+        puts "You're in check!"
+      end 
       turn(current_player)
       switch_players
     end
+    board.display
+    board.in_check_mate?(current_player.color) ? print_win_message : print_tie_message
   end
+
+  def game_over?
+    board.in_check_mate?(current_player.color) || board.in_stalemate?(current_player.color)
+  end 
 
   def turn(player)
     from_squ = nil
@@ -44,7 +52,7 @@ class Game
       puts to_squ
 
       begin
-        board.move_piece(from_squ, to_squ)
+        board.check_valid_move(from_squ, to_squ)
         break
       rescue InvalidMoveError => e
         puts e.message
@@ -60,54 +68,11 @@ class Game
                            end)
   end
 
-  def in_check?(player)
-    #color = player.color
-    #king = {King.color}.position
-    #other_player_pieces = {Piece.color != color}.all 
-    #do any other_player_pieces.available_moves.include(king)?
-  end 
-
-  def in_stalemate?
-    #current player cannot move any pieces without making their king in check
-  end 
-end
-
-#
-#   def play
-#     @current_player = player_one
-#     until board.board_full?
-#       turn(current_player)
-#       break if board.winner?
-#
-#       @current_player = switch_players
-#     end
-#   end
-#
-#
-# def game_over
-#   if board.winner?
-#     print_win_message(current_player)
-#   else
-#     print_tie_message
-#   end
-# end
-#
-# def print_win_message(player)
-#   puts "Congratulations #{player.marker}, you win!"
-# end
-#
-# def print_tie_message
-#   puts 'No winner, better luck next time...'
-# end
-#
-# def repeat
-#   puts 'Play again? Please enter (y/n):'
-#   response = gets.chomp
-#   if response == 'y'
-#     initialize
-#     start_game
-#   else
-#     puts 'Thanks for playing!'
-#   end
-# end
-# =
+  def print_win_message
+    player = switch_players
+    puts "Congratulations #{player.name}, you win!"
+  end
+ 
+  def print_tie_message
+    puts "It's a stalemate!"
+  end
